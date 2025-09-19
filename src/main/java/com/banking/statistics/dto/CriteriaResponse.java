@@ -1,6 +1,6 @@
-package com.banking.statics.dto;
+package com.banking.statistics.dto;
 
-import com.banking.statics.entity.Transaction;
+import com.banking.statistics.entity.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,8 +1,8 @@
-package com.banking.statics.service.impl;
+package com.banking.statistics.service.impl;
 
-import com.banking.statics.entity.Category;
-import com.banking.statics.repository.CategoryRepository;
-import com.banking.statics.service.CategoryService;
+import com.banking.statistics.entity.Category;
+import com.banking.statistics.repository.CategoryRepository;
+import com.banking.statistics.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

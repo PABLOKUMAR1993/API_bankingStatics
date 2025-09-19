@@ -1,8 +1,8 @@
-package com.banking.statics.service;
+package com.banking.statistics.service;
 
-import com.banking.statics.dto.CriteriaResponse;
-import com.banking.statics.dto.TransactionSearchParams;
-import com.banking.statics.entity.Transaction;
+import com.banking.statistics.dto.CriteriaResponse;
+import com.banking.statistics.dto.TransactionSearchParams;
+import com.banking.statistics.entity.Transaction;
 
 import java.util.List;
 

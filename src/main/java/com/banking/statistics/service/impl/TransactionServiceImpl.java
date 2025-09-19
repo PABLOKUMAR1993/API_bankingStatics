@@ -1,10 +1,10 @@
-package com.banking.statics.service.impl;
+package com.banking.statistics.service.impl;
 
-import com.banking.statics.dto.CriteriaResponse;
-import com.banking.statics.dto.TransactionSearchParams;
-import com.banking.statics.entity.Transaction;
-import com.banking.statics.repository.TransactionRepository;
-import com.banking.statics.service.TransactionService;
+import com.banking.statistics.dto.CriteriaResponse;
+import com.banking.statistics.dto.TransactionSearchParams;
+import com.banking.statistics.entity.Transaction;
+import com.banking.statistics.repository.TransactionRepository;
+import com.banking.statistics.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

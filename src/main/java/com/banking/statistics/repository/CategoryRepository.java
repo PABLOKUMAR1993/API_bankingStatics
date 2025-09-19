@@ -1,6 +1,6 @@
-package com.banking.statics.repository;
+package com.banking.statistics.repository;
 
-import com.banking.statics.entity.Category;
+import com.banking.statistics.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

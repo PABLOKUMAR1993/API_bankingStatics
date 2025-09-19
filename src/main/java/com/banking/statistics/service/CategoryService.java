@@ -1,6 +1,6 @@
-package com.banking.statics.service;
+package com.banking.statistics.service;
 
-import com.banking.statics.entity.Category;
+import com.banking.statistics.entity.Category;
 
 import java.util.List;
 

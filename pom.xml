@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>com.banking.statics</groupId>
-    <artifactId>API_bankingStatics</artifactId>
+    <artifactId>API_bankingStatistics</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 

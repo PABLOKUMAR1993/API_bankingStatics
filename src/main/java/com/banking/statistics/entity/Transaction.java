@@ -1,4 +1,4 @@
-package com.banking.statics.entity;
+package com.banking.statistics.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;

@@ -1,4 +1,4 @@
-package com.banking.statics.dto;
+package com.banking.statistics.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
