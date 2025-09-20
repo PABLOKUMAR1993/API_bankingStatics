@@ -12,6 +12,7 @@ public class ApiConstants {
     public static final String TRANSACTIONS_UPDATE = "/{id}";
     public static final String TRANSACTIONS_BULK_CREATE = "/bulk-create";
     public static final String TRANSACTIONS_SEARCH = "/search";
+    public static final String TRANSACTIONS_CURRENT_BALANCE = "/current-balance";
     
     private ApiConstants() {
     }

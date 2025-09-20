@@ -1,6 +1,7 @@
 package com.banking.statistics.service.impl;
 
 import com.banking.statistics.dto.CriteriaResponse;
+import com.banking.statistics.dto.CurrentBalanceResponse;
 import com.banking.statistics.dto.TransactionSearchParams;
 import com.banking.statistics.entity.Transaction;
 import com.banking.statistics.repository.TransactionRepository;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -94,6 +96,34 @@ public class TransactionServiceImpl implements TransactionService {
         } catch (Exception e) {
             log.error("Error searching transactions by criteria: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to search transactions by criteria", e);
+        }
+    }
+    
+    @Override
+    public CurrentBalanceResponse getCurrentBalance() {
+        try {
+            log.info("Getting current account balance");
+            
+            Pageable pageable = PageRequest.of(0, 1);
+            List<Transaction> latestTransactions = transactionRepository.findLatestTransaction(pageable);
+            
+            if (latestTransactions.isEmpty()) {
+                log.info("No transactions found, returning zero balance");
+                return new CurrentBalanceResponse(BigDecimal.ZERO, null, false);
+            }
+            
+            Transaction latestTransaction = latestTransactions.get(0);
+            log.info("Current balance: {} from transaction date: {}", 
+                    latestTransaction.getSaldo(), latestTransaction.getFechaOperacion());
+            
+            return new CurrentBalanceResponse(
+                    latestTransaction.getSaldo(),
+                    latestTransaction.getFechaOperacion(),
+                    true
+            );
+        } catch (Exception e) {
+            log.error("Error getting current balance: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to get current balance", e);
         }
     }
 

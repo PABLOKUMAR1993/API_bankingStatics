@@ -39,5 +39,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("categoryIds") List<Long> categoryIds,
             Pageable pageable
     );
+    
+    @Query("SELECT t FROM Transaction t ORDER BY t.fechaOperacion DESC, t.id DESC")
+    List<Transaction> findLatestTransaction(Pageable pageable);
 
 }

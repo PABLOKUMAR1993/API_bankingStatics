@@ -1,6 +1,7 @@
 package com.banking.statistics.service;
 
 import com.banking.statistics.dto.CriteriaResponse;
+import com.banking.statistics.dto.CurrentBalanceResponse;
 import com.banking.statistics.dto.TransactionSearchParams;
 import com.banking.statistics.entity.Transaction;
 
@@ -13,5 +14,7 @@ public interface TransactionService {
     List<Transaction> createBulk(List<Transaction> transactions);
     
     CriteriaResponse getByCriteria(TransactionSearchParams searchParams);
+    
+    CurrentBalanceResponse getCurrentBalance();
 
 }

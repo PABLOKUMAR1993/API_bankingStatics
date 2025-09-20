@@ -2,12 +2,12 @@ package com.banking.statistics.controller;
 
 import com.banking.statistics.constant.ApiConstants;
 import com.banking.statistics.dto.CriteriaResponse;
+import com.banking.statistics.dto.CurrentBalanceResponse;
 import com.banking.statistics.dto.TransactionSearchParams;
 import com.banking.statistics.entity.Transaction;
 import com.banking.statistics.service.TransactionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -81,6 +81,19 @@ public class TransactionController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error searching transactions by criteria: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping(ApiConstants.TRANSACTIONS_CURRENT_BALANCE)
+    public ResponseEntity<CurrentBalanceResponse> getCurrentBalance() {
+        try {
+            logger.info("Getting current account balance");
+            CurrentBalanceResponse response = transactionService.getCurrentBalance();
+            logger.info("Successfully retrieved current balance: {}", response.getCurrentBalance());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error getting current balance: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
