@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,10 +54,15 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public CriteriaResponse getByCriteria(TransactionSearchParams searchParams) {
         try {
-            log.info("Searching transactions with criteria: pageNumber={}, pageSize={}", 
-                    searchParams.getPageNumber(), searchParams.getPageSize());
+            log.info("Searching transactions with criteria: pageNumber={}, pageSize={}, sortBy={}, sortDirection={}", 
+                    searchParams.getPageNumber(), searchParams.getPageSize(), searchParams.getSortBy(), searchParams.getSortDirection());
             
-            Pageable pageable = PageRequest.of(searchParams.getPageNumber(), searchParams.getPageSize());
+            Sort.Direction direction = "asc".equalsIgnoreCase(searchParams.getSortDirection()) 
+                    ? Sort.Direction.ASC 
+                    : Sort.Direction.DESC;
+            
+            Sort sort = Sort.by(direction, searchParams.getSortBy());
+            Pageable pageable = PageRequest.of(searchParams.getPageNumber(), searchParams.getPageSize(), sort);
             
             Page<Transaction> transactionPage = transactionRepository.findByCriteria(
                     searchParams.getOperationDateFrom(),

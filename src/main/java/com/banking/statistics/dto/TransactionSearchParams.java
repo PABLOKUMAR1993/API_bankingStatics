@@ -25,5 +25,7 @@ public class TransactionSearchParams {
     private BigDecimal incomeAmountFrom;
     private BigDecimal incomeAmountTo;
     private List<Long> categoryIds;
+    private String sortBy = "fechaOperacion";
+    private String sortDirection = "desc";
 
 }
