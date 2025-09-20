@@ -46,7 +46,7 @@ public class Transaction {
     @Column(name = "saldo", nullable = false, precision = 15, scale = 2)
     private BigDecimal saldo;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
     
