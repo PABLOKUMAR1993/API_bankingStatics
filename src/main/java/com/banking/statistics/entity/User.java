@@ -1,5 +1,6 @@
 package com.banking.statistics.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +39,7 @@ public class User {
     private Boolean activo = false;
     
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Transaction> transactions = new ArrayList<>();
 
 }

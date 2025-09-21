@@ -1,5 +1,6 @@
 package com.banking.statistics.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
@@ -52,6 +53,7 @@ public class Transaction {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_email", nullable = false)
+    @JsonBackReference
     private User user;
     
     @Column(name = "notes", columnDefinition = "TEXT")
