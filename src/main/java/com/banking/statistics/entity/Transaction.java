@@ -50,6 +50,10 @@ public class Transaction {
     @JoinColumn(name = "category_id")
     private Category category;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_email", nullable = false)
+    private User user;
+    
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 

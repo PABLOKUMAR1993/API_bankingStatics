@@ -1,5 +1,15 @@
 -- Banking Statistics Database Schema
--- MySQL script to create tables for banking transactions and categories
+-- MySQL script to create tables for banking transactions, categories and users
+
+-- Create users table
+CREATE TABLE IF NOT EXISTS users (
+    email VARCHAR(255) PRIMARY KEY,
+    nombre_usuario VARCHAR(50) NOT NULL,
+    contrasenya VARCHAR(255) NOT NULL,
+    activo BOOLEAN NOT NULL DEFAULT FALSE,
+    
+    CONSTRAINT uk_user_username UNIQUE (nombre_usuario)
+);
 
 -- Create categories table
 CREATE TABLE IF NOT EXISTS categories (
@@ -20,13 +30,16 @@ CREATE TABLE IF NOT EXISTS transactions (
     ingresos DECIMAL(15,2) DEFAULT 0.00,
     saldo DECIMAL(15,2) NOT NULL,
     category_id BIGINT,
+    user_email VARCHAR(255) NOT NULL,
     notes TEXT,
     
     CONSTRAINT fk_transaction_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
+    CONSTRAINT fk_transaction_user FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE,
     INDEX idx_fecha_operacion (fecha_operacion),
     INDEX idx_fecha_valor (fecha_valor),
     INDEX idx_concepto (concepto),
-    INDEX idx_category_id (category_id)
+    INDEX idx_category_id (category_id),
+    INDEX idx_user_email (user_email)
 );
 
 -- Insert default categories
