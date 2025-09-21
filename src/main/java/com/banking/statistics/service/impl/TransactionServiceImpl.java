@@ -4,7 +4,9 @@ import com.banking.statistics.dto.CriteriaResponse;
 import com.banking.statistics.dto.CurrentBalanceResponse;
 import com.banking.statistics.dto.TransactionSearchParams;
 import com.banking.statistics.entity.Transaction;
+import com.banking.statistics.entity.User;
 import com.banking.statistics.repository.TransactionRepository;
+import com.banking.statistics.repository.UserRepository;
 import com.banking.statistics.service.TransactionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +26,16 @@ import java.util.List;
 public class TransactionServiceImpl implements TransactionService {
     
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
     
     @Override
     @Transactional
-    public Transaction updateOne(Transaction transaction) {
+    public Transaction updateOne(Transaction transaction, String userEmail) {
         try {
-            log.info("Updating transaction with ID: {}", transaction.getId());
+            log.info("Updating transaction with ID: {} for user: {}", transaction.getId(), userEmail);
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + userEmail));
+            transaction.setUser(user);
             Transaction updatedTransaction = transactionRepository.save(transaction);
             log.info("Successfully updated transaction with ID: {}", updatedTransaction.getId());
             return updatedTransaction;
@@ -41,9 +47,12 @@ public class TransactionServiceImpl implements TransactionService {
     
     @Override
     @Transactional
-    public List<Transaction> createBulk(List<Transaction> transactions) {
+    public List<Transaction> createBulk(List<Transaction> transactions, String userEmail) {
         try {
-            log.info("Creating {} transactions in bulk", transactions.size());
+            log.info("Creating {} transactions in bulk for user: {}", transactions.size(), userEmail);
+            User user = userRepository.findByEmail(userEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + userEmail));
+            transactions.forEach(transaction -> transaction.setUser(user));
             List<Transaction> createdTransactions = transactionRepository.saveAll(transactions);
             log.info("Successfully created {} transactions", createdTransactions.size());
             return createdTransactions;
@@ -54,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
     
     @Override
-    public CriteriaResponse getByCriteria(TransactionSearchParams searchParams) {
+    public CriteriaResponse getByCriteria(TransactionSearchParams searchParams, String userEmail) {
         try {
             log.info("Searching transactions with criteria: pageNumber={}, pageSize={}, sortBy={}, sortDirection={}", 
                     searchParams.getPageNumber(), searchParams.getPageSize(), searchParams.getSortBy(), searchParams.getSortDirection());
@@ -67,6 +76,7 @@ public class TransactionServiceImpl implements TransactionService {
             Pageable pageable = PageRequest.of(searchParams.getPageNumber(), searchParams.getPageSize(), sort);
             
             Page<Transaction> transactionPage = transactionRepository.findByCriteria(
+                    userEmail,
                     searchParams.getOperationDateFrom(),
                     searchParams.getOperationDateTo(),
                     searchParams.getValueDateFrom(),
@@ -100,12 +110,12 @@ public class TransactionServiceImpl implements TransactionService {
     }
     
     @Override
-    public CurrentBalanceResponse getCurrentBalance() {
+    public CurrentBalanceResponse getCurrentBalance(String userEmail) {
         try {
-            log.info("Getting current account balance");
+            log.info("Getting current account balance for user: {}", userEmail);
             
             Pageable pageable = PageRequest.of(0, 1);
-            List<Transaction> latestTransactions = transactionRepository.findLatestTransaction(pageable);
+            List<Transaction> latestTransactions = transactionRepository.findLatestTransaction(userEmail, pageable);
             
             if (latestTransactions.isEmpty()) {
                 log.info("No transactions found, returning zero balance");

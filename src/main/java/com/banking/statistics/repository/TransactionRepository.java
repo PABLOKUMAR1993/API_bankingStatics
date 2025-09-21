@@ -16,6 +16,7 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     
     @Query("SELECT t FROM Transaction t WHERE " +
+           "t.user.email = :userEmail AND " +
            "(:operationDateFrom IS NULL OR t.fechaOperacion >= :operationDateFrom) AND " +
            "(:operationDateTo IS NULL OR t.fechaOperacion <= :operationDateTo) AND " +
            "(:valueDateFrom IS NULL OR t.fechaValor >= :valueDateFrom) AND " +
@@ -27,6 +28,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
            "(:incomeAmountTo IS NULL OR t.ingresos <= :incomeAmountTo) AND " +
            "(:categoryIds IS NULL OR t.category.id IN :categoryIds)")
     Page<Transaction> findByCriteria(
+            @Param("userEmail") String userEmail,
             @Param("operationDateFrom") LocalDate operationDateFrom,
             @Param("operationDateTo") LocalDate operationDateTo,
             @Param("valueDateFrom") LocalDate valueDateFrom,
@@ -40,7 +42,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             Pageable pageable
     );
     
-    @Query("SELECT t FROM Transaction t ORDER BY t.fechaOperacion DESC, t.id DESC")
-    List<Transaction> findLatestTransaction(Pageable pageable);
+    @Query("SELECT t FROM Transaction t WHERE t.user.email = :userEmail ORDER BY t.fechaOperacion DESC, t.id DESC")
+    List<Transaction> findLatestTransaction(@Param("userEmail") String userEmail, Pageable pageable);
 
 }

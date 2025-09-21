@@ -9,12 +9,12 @@ import java.util.List;
 
 public interface TransactionService {
     
-    Transaction updateOne(Transaction transaction);
+    Transaction updateOne(Transaction transaction, String userEmail);
     
-    List<Transaction> createBulk(List<Transaction> transactions);
+    List<Transaction> createBulk(List<Transaction> transactions, String userEmail);
     
-    CriteriaResponse getByCriteria(TransactionSearchParams searchParams);
+    CriteriaResponse getByCriteria(TransactionSearchParams searchParams, String userEmail);
     
-    CurrentBalanceResponse getCurrentBalance();
+    CurrentBalanceResponse getCurrentBalance(String userEmail);
 
 }
