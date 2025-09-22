@@ -44,5 +44,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     
     @Query("SELECT t FROM Transaction t WHERE t.user.email = :userEmail ORDER BY t.fechaOperacion DESC, t.id DESC")
     List<Transaction> findLatestTransaction(@Param("userEmail") String userEmail, Pageable pageable);
+    
+    @Query("SELECT t FROM Transaction t WHERE " +
+           "t.user.email = :userEmail AND " +
+           "t.fechaOperacion = :fechaOperacion AND " +
+           "t.concepto = :concepto AND " +
+           "t.pagos = :pagos AND " +
+           "t.ingresos = :ingresos")
+    List<Transaction> findDuplicates(
+            @Param("userEmail") String userEmail,
+            @Param("fechaOperacion") LocalDate fechaOperacion,
+            @Param("concepto") String concepto,
+            @Param("pagos") BigDecimal pagos,
+            @Param("ingresos") BigDecimal ingresos
+    );
 
 }

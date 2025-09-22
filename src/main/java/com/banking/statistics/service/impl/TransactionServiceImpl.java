@@ -52,8 +52,31 @@ public class TransactionServiceImpl implements TransactionService {
             log.info("Creating {} transactions in bulk for user: {}", transactions.size(), userEmail);
             User user = userRepository.findByEmail(userEmail)
                     .orElseThrow(() -> new RuntimeException("User not found: " + userEmail));
-            transactions.forEach(transaction -> transaction.setUser(user));
-            List<Transaction> createdTransactions = transactionRepository.saveAll(transactions);
+            
+            List<Transaction> nonDuplicateTransactions = transactions.stream()
+                    .filter(transaction -> {
+                        List<Transaction> duplicates = transactionRepository.findDuplicates(
+                                userEmail,
+                                transaction.getFechaOperacion(),
+                                transaction.getConcepto(),
+                                transaction.getPagos(),
+                                transaction.getIngresos()
+                        );
+                        
+                        if (!duplicates.isEmpty()) {
+                            log.warn("Duplicate transaction found for date: {}, concept: {}, skipping", 
+                                    transaction.getFechaOperacion(), transaction.getConcepto());
+                            return false;
+                        }
+                        return true;
+                    })
+                    .toList();
+            
+            log.info("Filtered {} duplicate transactions, proceeding with {} unique transactions", 
+                    transactions.size() - nonDuplicateTransactions.size(), nonDuplicateTransactions.size());
+            
+            nonDuplicateTransactions.forEach(transaction -> transaction.setUser(user));
+            List<Transaction> createdTransactions = transactionRepository.saveAll(nonDuplicateTransactions);
             log.info("Successfully created {} transactions", createdTransactions.size());
             return createdTransactions;
         } catch (Exception e) {
