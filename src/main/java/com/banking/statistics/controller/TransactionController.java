@@ -1,6 +1,8 @@
 package com.banking.statistics.controller;
 
 import com.banking.statistics.constant.ApiConstants;
+import com.banking.statistics.dto.ChartDataRequest;
+import com.banking.statistics.dto.ChartDataResponse;
 import com.banking.statistics.dto.CriteriaResponse;
 import com.banking.statistics.dto.CurrentBalanceResponse;
 import com.banking.statistics.dto.TransactionSearchParams;
@@ -122,6 +124,37 @@ public class TransactionController {
             return authentication.getName();
         }
         return null;
+    }
+
+    @PostMapping(ApiConstants.TRANSACTIONS_CHART_DATA)
+    public ResponseEntity<ChartDataResponse> getChartData(@RequestBody ChartDataRequest request) {
+        String userEmail = getCurrentUserEmail();
+        if (userEmail == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        try {
+            if (request == null || request.getDateFrom() == null || request.getDateTo() == null) {
+                logger.warn("Received invalid chart data request");
+                return ResponseEntity.badRequest().build();
+            }
+            
+            if (request.getDateFrom().isAfter(request.getDateTo())) {
+                logger.warn("Invalid date range: dateFrom {} is after dateTo {}", 
+                           request.getDateFrom(), request.getDateTo());
+                return ResponseEntity.badRequest().build();
+            }
+            
+            logger.info("Getting chart data for user: {} from {} to {}", 
+                       userEmail, request.getDateFrom(), request.getDateTo());
+            ChartDataResponse response = transactionService.getChartData(
+                    request.getDateFrom(), request.getDateTo(), userEmail);
+            logger.info("Successfully retrieved chart data with {} monthly periods", 
+                       response.getMonthlyData().size());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error getting chart data: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 }

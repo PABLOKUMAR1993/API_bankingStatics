@@ -1,10 +1,12 @@
 package com.banking.statistics.service;
 
+import com.banking.statistics.dto.ChartDataResponse;
 import com.banking.statistics.dto.CriteriaResponse;
 import com.banking.statistics.dto.CurrentBalanceResponse;
 import com.banking.statistics.dto.TransactionSearchParams;
 import com.banking.statistics.entity.Transaction;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface TransactionService {
@@ -16,5 +18,7 @@ public interface TransactionService {
     CriteriaResponse getByCriteria(TransactionSearchParams searchParams, String userEmail);
     
     CurrentBalanceResponse getCurrentBalance(String userEmail);
+    
+    ChartDataResponse getChartData(LocalDate dateFrom, LocalDate dateTo, String userEmail);
 
 }

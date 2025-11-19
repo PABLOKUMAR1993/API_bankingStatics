@@ -1,7 +1,9 @@
 package com.banking.statistics.service.impl;
 
+import com.banking.statistics.dto.ChartDataResponse;
 import com.banking.statistics.dto.CriteriaResponse;
 import com.banking.statistics.dto.CurrentBalanceResponse;
+import com.banking.statistics.dto.MonthlyChartData;
 import com.banking.statistics.dto.TransactionSearchParams;
 import com.banking.statistics.entity.Transaction;
 import com.banking.statistics.entity.User;
@@ -18,6 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,7 +57,7 @@ public class TransactionServiceImpl implements TransactionService {
             log.info("Creating {} transactions in bulk for user: {}", transactions.size(), userEmail);
             User user = userRepository.findByEmail(userEmail)
                     .orElseThrow(() -> new RuntimeException("User not found: " + userEmail));
-            
+
             List<Transaction> nonDuplicateTransactions = transactions.stream()
                     .filter(transaction -> {
                         List<Transaction> duplicates = transactionRepository.findDuplicates(
@@ -62,19 +67,19 @@ public class TransactionServiceImpl implements TransactionService {
                                 transaction.getPagos(),
                                 transaction.getIngresos()
                         );
-                        
+
                         if (!duplicates.isEmpty()) {
-                            log.warn("Duplicate transaction found for date: {}, concept: {}, skipping", 
+                            log.warn("Duplicate transaction found for date: {}, concept: {}, skipping",
                                     transaction.getFechaOperacion(), transaction.getConcepto());
                             return false;
                         }
                         return true;
                     })
                     .toList();
-            
-            log.info("Filtered {} duplicate transactions, proceeding with {} unique transactions", 
+
+            log.info("Filtered {} duplicate transactions, proceeding with {} unique transactions",
                     transactions.size() - nonDuplicateTransactions.size(), nonDuplicateTransactions.size());
-            
+
             nonDuplicateTransactions.forEach(transaction -> transaction.setUser(user));
             List<Transaction> createdTransactions = transactionRepository.saveAll(nonDuplicateTransactions);
             log.info("Successfully created {} transactions", createdTransactions.size());
@@ -157,6 +162,45 @@ public class TransactionServiceImpl implements TransactionService {
         } catch (Exception e) {
             log.error("Error getting current balance: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to get current balance", e);
+        }
+    }
+
+    @Override
+    public ChartDataResponse getChartData(LocalDate dateFrom, LocalDate dateTo, String userEmail) {
+        try {
+            log.info("Getting chart data for user: {} from {} to {}", userEmail, dateFrom, dateTo);
+
+            List<Object[]> rawData = transactionRepository.getMonthlyChartData(userEmail, dateFrom, dateTo);
+            List<MonthlyChartData> monthlyData = new ArrayList<>();
+
+            for (Object[] row : rawData) {
+                Integer year = (Integer) row[0];
+                Integer month = (Integer) row[1];
+                BigDecimal totalIngresos = (BigDecimal) row[2];
+                BigDecimal totalPagos = (BigDecimal) row[3];
+
+                totalIngresos = totalIngresos != null ? totalIngresos : BigDecimal.ZERO;
+                totalPagos = totalPagos != null ? totalPagos : BigDecimal.ZERO;
+
+                String period = String.format("%04d-%02d", year, month);
+                BigDecimal netBalance = totalIngresos.subtract(totalPagos);
+
+                MonthlyChartData chartData = new MonthlyChartData(
+                        period,
+                        totalIngresos,
+                        totalPagos,
+                        netBalance
+                );
+
+                monthlyData.add(chartData);
+            }
+
+            log.info("Generated chart data with {} monthly periods", monthlyData.size());
+            return new ChartDataResponse(dateFrom, dateTo, monthlyData);
+
+        } catch (Exception e) {
+            log.error("Error getting chart data: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to get chart data", e);
         }
     }
 

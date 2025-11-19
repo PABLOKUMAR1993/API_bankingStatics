@@ -58,5 +58,21 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("pagos") BigDecimal pagos,
             @Param("ingresos") BigDecimal ingresos
     );
+    
+    @Query("SELECT " +
+           "FUNCTION('YEAR', t.fechaOperacion) as year, " +
+           "FUNCTION('MONTH', t.fechaOperacion) as month, " +
+           "SUM(t.ingresos) as totalIngresos, " +
+           "SUM(t.pagos) as totalPagos " +
+           "FROM Transaction t " +
+           "WHERE t.user.email = :userEmail " +
+           "AND t.fechaOperacion BETWEEN :dateFrom AND :dateTo " +
+           "GROUP BY FUNCTION('YEAR', t.fechaOperacion), FUNCTION('MONTH', t.fechaOperacion) " +
+           "ORDER BY year, month")
+    List<Object[]> getMonthlyChartData(
+            @Param("userEmail") String userEmail,
+            @Param("dateFrom") LocalDate dateFrom,
+            @Param("dateTo") LocalDate dateTo
+    );
 
 }
