@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://movimeintos-bancarios-db.c7qa0ykkyzjk.eu-west-1.rds.amazonaws.com:3306/movimientos_db}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:dKYSvt.qF5yqWGi}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # Connection pool para Lambda (conexiones ligeras)
+    hikari:
+      maximum-pool-size: 2
+      minimum-idle: 0
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 600000
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    show-sql: false
+
+jwt:
+  secret: ${JWT_SECRET}
+
+logging:
+  level:
+    root: WARN
+    com.banking.statistics: INFO
+
+server:
+  port: 8080
